@@ -1,14 +1,16 @@
 package com.shopping.mall.product;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api")
 public class ProductController {
+
+    private final ProductService productService;
 
     @GetMapping("/health")
     public String health(){
@@ -17,13 +19,15 @@ public class ProductController {
 
     @GetMapping("/products")
     public List<ProductDto> getProducts() {
-        return List.of(
-                new ProductDto(1L, "무선 마우스", 19900, 12, "ON_SALE",
-                        "https://via.placeholder.com/150"),
-                new ProductDto(2L, "기계식 키보드", 89000, 5, "ON_SALE",
-                        "https://via.placeholder.com/150"),
-                new ProductDto(3L, "게이밍 모니터", 299000, 0, "SOLD_OUT",
-                        "https://via.placeholder.com/150")
-        );
+        return productService.findAll().stream()
+                .map(ProductDto::from)
+                .toList();
     }
+
+    @PostMapping("/admin/products")
+    public ProductDto createProduct(@RequestBody CreateProductRequest req) {
+        Product p = productService.create(req.name(), req.price(), req.stock(), req.thumbnailUrl());
+        return ProductDto.from(p);
+    }
+
 }

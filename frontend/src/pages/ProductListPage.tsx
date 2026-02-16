@@ -11,51 +11,62 @@ type Product = {
 
 export default function ProductListPage() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const load = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch("/api/products");
+            const data = await res.json();
+            setProducts(data);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        fetch("/api/products")
-            .then((res) => res.json())
-            .then((data) => setProducts(data));
+        load()
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-100 p-8">
-            <h1 className="text-3xl font-bold mb-6">
-                상품 목록    
-            </h1>
+        <div>
+            <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-bold">상품 목록 </h1>
+                <button 
+                    onClick={load}
+                    className="px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
+                >
+                    {loading ? "불러오는 중..." : "새로고침"}
+                </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {products.map((product) => (
-                    <div 
-                        key={product.id}
-                        className="bg-white rounded-xl shadow p-4"
-                    >
+                {products.map((p) => (
+                    <div key={p.id} className="bg-white rounded-xl shadow p-4">
                         <img 
-                            src={product.thumbnailUrl}
-                            alt={product.name}
+                            src={p.thumbnailUrl}
+                            alt={p.name}
                             className="w-full h-40 object-cover rounded"
                         />
+                        <h2 className="mt-4 text-lg font-semibold">{p.name}</h2>
+                        <p className="text-gray-600 mt-2">{p.price.toLocaleString()}원</p>
 
-                        <h2 className="mt-4 text-lg font-semibold">
-                            {product.name}
-                        </h2>
-
-                        <p className="text-gray-600 mt-2">
-                            {product.price.toLocaleString()}원
-                        </p>
-
-                        {product.status === "SOLD_OUT" ? (
-                            <button className="mt-3 w-full bg-gray-400 text-white py-2 rounded">
+                        {p.status === "SOLD_OUT" ? (
+                            <button className="mt-3 w-full bg-gray-400 text-white py-2 rounded cursor-not-allowed">
                                 품절
                             </button>
                         ) : (
                             <button className="mt-3 w-full bg-black text-white py-2 rounded hover:bg-gray-800">
                                 장바구니 담기
                             </button>
-                        )}
+                        )} 
                     </div>
                 ))}
             </div>
+
+            {products.length === 0 && !loading && (
+                <p className="text-gray-500 mt-8">상품이 아직 없습니다. 등록하세요!</p>
+            )}
         </div>
     );
 }
