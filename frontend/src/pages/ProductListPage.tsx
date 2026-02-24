@@ -28,6 +28,8 @@ export default function ProductListPage() {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<PageResp<Product> | null>(null);
 
+    const [wishedMap, setWishedMap] = useState<Record<number, boolean>>({});
+
     const params = useMemo(() => {
         const p = new URLSearchParams();
         if (query.trim()) p.set("query", query.trim());
@@ -142,6 +144,20 @@ export default function ProductListPage() {
                         장바구니 담기
                     </button>
                     )}
+
+                    <button 
+                        onClick={async() => {
+                            const res = await fetch(`/api/wishlist/${p.id}/toggle`, {method: "POST"});
+                            const json = await res.json();
+                            setWishedMap((prev) => ({ ...prev, [p.id]: json.wished }));
+                        }}
+                        className={`w-28 border py-2 rounded hover:bg-gray-50 ${
+                            wishedMap[p.id] ? "border-black" : "border-gray-300"
+                        }`}
+                        title="찜하기"
+                    >
+                        {wishedMap[p.id] ? "❤️" : "🤍"}
+                    </button>
                 </div>
                 ))}
             </div>

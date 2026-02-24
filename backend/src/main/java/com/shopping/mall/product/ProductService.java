@@ -17,8 +17,24 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public Page<Product> findPage(String query, int page, int size, Sort sort) {
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public Page<Product> findPage(String query, int page, int size, String sortKey) {
+        Pageable pageable;
+
+        if ("POPULAR".equals(sortKey)) {
+            pageable = PageRequest.of(page, size);
+            if (query == null || query.isBlank()) {
+                return productRepository.findAllOrderByPopular(pageable);
+            }
+            return productRepository.findByNameOrderByPopular(query.trim(), pageable);
+        }
+
+        Sort sort = switch (sortKey) {
+            case "PRICE_ASC" -> Sort.by(Sort.Direction.ASC, "price");
+            case "PRICE_DESC" -> Sort.by(Sort.Direction.DESC, "price");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
+
+        pageable = PageRequest.of(page, size, sort);
 
         if (query == null || query.isBlank()) {
             return productRepository.findAll(pageable);

@@ -26,18 +26,8 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size
     ) {
-        Sort s = mapSort(sort);
-        return productService.findPage(query, page, size, s)
+        return productService.findPage(query, page, size, sort)
                 .map(ProductDto::from);
-    }
-
-    private Sort mapSort(String sort) {
-        return switch (sort) {
-            case "PRICE_ASC" -> Sort.by(Sort.Direction.ASC, "price");
-            case "PRICE_DESC" ->  Sort.by(Sort.Direction.DESC, "price");
-            case "POPULAR" ->  Sort.by(Sort.Direction.DESC, "createdAt");
-            default -> Sort.by(Sort.Direction.DESC, "createdAt");       // LATEST
-        };
     }
 
     @PostMapping("/admin/products")
