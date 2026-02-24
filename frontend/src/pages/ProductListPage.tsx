@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 type Product = {
     id: number;
@@ -29,6 +30,8 @@ export default function ProductListPage() {
     const [data, setData] = useState<PageResp<Product> | null>(null);
 
     const [wishedMap, setWishedMap] = useState<Record<number, boolean>>({});
+
+    const nav = useNavigate();
 
     const params = useMemo(() => {
         const p = new URLSearchParams();
@@ -126,7 +129,7 @@ export default function ProductListPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {products.map((p) => (
-                <div key={p.id} className="bg-white rounded-xl shadow p-4">
+                <div key={p.id} className="bg-white rounded-xl shadow p-4 cursor-pointer" onClick={() => nav(`/p/${p.id}`)}>
                     <img
                     src={p.thumbnailUrl}
                     alt={p.name}
@@ -140,13 +143,19 @@ export default function ProductListPage() {
                         품절
                     </button>
                     ) : (
-                    <button className="mt-3 w-full bg-black text-white py-2 rounded hover:bg-gray-800">
+                    <button 
+                        className="mt-3 w-full bg-black text-white py-2 rounded hover:bg-gray-800"
+                        onClick={async(e) => {
+                            e.stopPropagation();
+                        }}
+                    >   
                         장바구니 담기
                     </button>
                     )}
 
                     <button 
-                        onClick={async() => {
+                        onClick={async(e) => {
+                            e.stopPropagation();
                             const res = await fetch(`/api/wishlist/${p.id}/toggle`, {method: "POST"});
                             const json = await res.json();
                             setWishedMap((prev) => ({ ...prev, [p.id]: json.wished }));

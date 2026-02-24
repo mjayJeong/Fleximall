@@ -1,6 +1,7 @@
 package com.shopping.mall.product;
 
-import jakarta.transaction.Transactional;
+import com.shopping.mall.wishlist.WishlistRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +17,9 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final WishlistRepository wishlistRepository;
+
+    private static final Long DEMO_USER_ID = 1L;
 
     public Page<Product> findPage(String query, int page, int size, String sortKey) {
         Pageable pageable;
@@ -57,5 +61,25 @@ public class ProductService {
 
         product.changeStock(stock);
         return productRepository.save(product);
+    }
+
+    @Transactional(readOnly = true)
+    public ProductDetailDto getDetail(Long id) {
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("product not found"));
+
+        long wishCount = wishlistRepository.countByProduct_Id(id);
+        boolean wished = wishlistRepository.existsByUserIdAndProduct_Id(DEMO_USER_ID, id);
+
+        return new ProductDetailDto(
+                p.getId(),
+                p.getName(),
+                p.getPrice(),
+                p.getStock(),
+                p.getStatus().name(),
+                p.getThumbnailUrl(),
+                wishCount,
+                wished
+        );
     }
 }
