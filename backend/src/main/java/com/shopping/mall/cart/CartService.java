@@ -48,7 +48,7 @@ public class CartService {
             throw new IllegalArgumentException("sold out");
         }
 
-        CartItem item = cartItemRepository.findByIdAndUserIdAndProduct_Id(DEMO_USER_ID, productId)
+        CartItem item = cartItemRepository.findByUserIdAndProduct_Id(DEMO_USER_ID, productId)
                 .orElse(null);
 
         if (item == null) {
@@ -69,7 +69,7 @@ public class CartService {
             return;
         }
 
-        CartItem item = cartItemRepository.findByIdAndUserIdAndProduct_Id(DEMO_USER_ID, productId)
+        CartItem item = cartItemRepository.findByUserIdAndProduct_Id(DEMO_USER_ID, productId)
                 .orElseThrow(() -> new IllegalArgumentException("cart item not found"));
 
         item.changeQuantity(quantity);
