@@ -147,6 +147,12 @@ export default function ProductListPage() {
                         className="mt-3 w-full bg-black text-white py-2 rounded hover:bg-gray-800"
                         onClick={async(e) => {
                             e.stopPropagation();
+                            await fetch("/api/cart/items", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ productId: p.id, quantity: 1 }),
+                            });
+                            alert("장바구니에 담았어!");
                         }}
                     >   
                         장바구니 담기

@@ -2,6 +2,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import ProductListPage from "./pages/ProductListPage";
 import AdminProductNewPage from "./pages/AdminProductNewPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import CartPage from "./pages/CartPage";
 
 export default function App() {
   return (
@@ -18,6 +19,9 @@ export default function App() {
             <Link className="hover:underline" to="/admin/products/new">
               관리자: 상품 등록
             </Link>
+            <Link className="hover:underline" to="/cart">
+              장바구니
+            </Link>
           </nav>
         </div>
       </header>
@@ -27,6 +31,7 @@ export default function App() {
           <Route path="/" element={<ProductListPage />} />
           <Route path="/admin/products/new" element={<AdminProductNewPage />} />
           <Route path="/p/:id" element={<ProductDetailPage />} />
+          <Route path="/cart" element={<CartPage />} />
         </Routes>
       </main>
     </div>

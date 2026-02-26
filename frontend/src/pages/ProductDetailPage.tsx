@@ -128,7 +128,14 @@ export default function ProductDetailPage() {
                                 ) : (
                                     <button
                                         className="flex-1 bg-black text-white py-3 rounded hover:bg-gray-800"
-                                        onClick={() => alert("다음 단계에서 붙임")}
+                                        onClick={async() => {
+                                            await fetch("/api/cart/items", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ productId: data.id, quantity: 1 }),
+                                            });
+                                            alert("장바구니에 담았어!");
+                                        }}
                                     >
                                         장바구니 담기
                                     </button>
