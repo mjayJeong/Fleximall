@@ -4,6 +4,8 @@ import AdminProductNewPage from "./pages/AdminProductNewPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
 import OrdersPage from "./pages/OrdersPage";
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminOrdersPage from './pages/AdminOrdersPage';
 
 export default function App() {
   return (
@@ -17,14 +19,20 @@ export default function App() {
             <Link className="hover:underline" to="/">
               상품
             </Link>
-            <Link className="hover:underline" to="/admin/products/new">
-              관리자: 상품 등록
-            </Link>
             <Link className="hover:underline" to="/cart">
               장바구니
             </Link>
             <Link className="hover:underline" to="/orders">
               주문내역
+            </Link>
+            <Link className="hover:underline" to="/admin/products/new">
+              관리자: 상품 등록
+            </Link>
+            <Link className="hover:underline" to="/admin/dashboard">
+              관리자 대시보드
+            </Link>
+            <Link className="hover:underline" to="/admin/orders">
+              관리자 주문관리
             </Link>
           </nav>
         </div>
@@ -37,6 +45,8 @@ export default function App() {
           <Route path="/p/:id" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/admin/orders" element={<AdminOrdersPage />} />    
         </Routes>
       </main>
     </div>
