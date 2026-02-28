@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByNameContainingIgnoreCase(String query, Pageable pageable);
 
@@ -27,4 +29,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             ORDER BY COUNT(w) DESC, p.createdAt DESC
             """)
     Page<Product> findByNameOrderByPopular(@Param("query") String query, Pageable pageable);
+
+    List<Product> findTop5ByOrderByStockAsc();
 }

@@ -5,6 +5,9 @@ import com.shopping.mall.cart.CartItemRepository;
 import com.shopping.mall.product.Product;
 import com.shopping.mall.product.ProductRepository;
 import com.shopping.mall.product.ProductStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -103,5 +106,22 @@ public class OrderService {
                 o.getCreatedAt(),
                 items
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderDto> getAllOrders(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderRepository.findAllByOrderByCreatedAtDesc(pageable)
+                .map(this::toDto);
+    }
+
+    public OrderDto adminUpdateStatus(Long orderId, String status) {
+        Order o = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("order not found"));
+
+        OrderStatus next = OrderStatus.valueOf(status);     // "PAID" 같은 값
+        o.changeStatus(next);
+
+        return toDto(o);
     }
 }
