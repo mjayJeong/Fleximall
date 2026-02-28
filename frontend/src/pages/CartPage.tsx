@@ -163,7 +163,16 @@ export default function CartPage() {
             <button
               className="w-full bg-black text-white py-3 rounded-xl hover:bg-gray-800 disabled:opacity-60"
               disabled={items.length === 0 || items.some((it) => it.quantity > it.stock)}
-              onClick={() => alert("다음 단계에서 주문/결제 API 붙일 거야!")}
+              onClick={async() => {
+                const res = await fetch("/api/orders", { method: "POST" });
+                if (!res.ok) {
+                  const text = await res.text();
+                  alert(text || "주문 실패");
+                  return;
+                }
+                alert("주문 완료");
+                await load();
+              }}
             >
               주문하기
             </button>
