@@ -40,4 +40,7 @@ public class Product {
         this.status = (stock <= 0) ? ProductStatus.SOLD_OUT : ProductStatus.ON_SALE;
     }
 
+    public void changeThumbnailUrl(String url) {
+        this.thumbnailUrl = url;
+    }
 }
