@@ -32,7 +32,7 @@ export default function App() {
               주문내역
             </Link>
             <Link className="text-red-500 hover:underline" to="/admin/products/new">
-              관리자: 상품 등록
+              상품 등록
             </Link>
             <Link className="text-red-500 hover:underline" to="/admin/dashboard">
               관리자 대시보드

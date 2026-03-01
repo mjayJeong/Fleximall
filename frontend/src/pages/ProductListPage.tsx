@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../lib/api";
 
 type Product = {
     id: number;
@@ -45,7 +46,7 @@ export default function ProductListPage() {
     const load = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/products?${params}`);
+            const res = await apiFetch(`/api/products?${params}`);
             if (!res.ok) {
                 const text = await res.text();
                 throw new Error(text || `HTTP ${res.status}`);
@@ -133,6 +134,7 @@ export default function ProductListPage() {
                     <img
                     src={p.thumbnailUrl}
                     alt={p.name}
+                    onError={(e) => { e.currentTarget.src = "/no-image.svg"; }}
                     className="w-full h-40 object-cover rounded"
                     />
                     <h2 className="mt-4 text-lg font-semibold">{p.name}</h2>
@@ -147,11 +149,15 @@ export default function ProductListPage() {
                         className="mt-3 w-full bg-black text-white py-2 rounded hover:bg-gray-800"
                         onClick={async(e) => {
                             e.stopPropagation();
-                            await fetch("/api/cart/items", {
+                            const res = await apiFetch("/api/cart/items", {
                                 method: "POST",
-                                headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({ productId: p.id, quantity: 1 }),
                             });
+                            if (!res.ok) {
+                                const text = await res.text();
+                                alert(text || "장바구니 추가 실패");
+                                return;
+                            }
                             alert("장바구니에 담았어!");
                         }}
                     >   
@@ -162,7 +168,12 @@ export default function ProductListPage() {
                     <button 
                         onClick={async(e) => {
                             e.stopPropagation();
-                            const res = await fetch(`/api/wishlist/${p.id}/toggle`, {method: "POST"});
+                            const res = await apiFetch(`/api/wishlist/${p.id}/toggle`, {method: "POST"});
+                            if (!res.ok) {
+                                const text = await res.text();
+                                alert(text || "찜 처리 실패");
+                                return;
+                            }
                             const json = await res.json();
                             setWishedMap((prev) => ({ ...prev, [p.id]: json.wished }));
                         }}

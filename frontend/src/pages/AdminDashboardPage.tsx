@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { apiFetch } from '../lib/api';
 
 type LowStock = {
   id: number;
@@ -21,9 +22,16 @@ export default function AdminDashboardPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/dashboard");
+      const res = await apiFetch("/api/admin/dashboard");
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `HTTP ${res.status}`);
+      }
       const json = await res.json();
       setData(json);
+    } catch (e) {
+      console.error(e);
+      setData(null);
     } finally {
       setLoading(false);
     }

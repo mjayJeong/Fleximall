@@ -23,7 +23,8 @@ public class AdminProductController {
 
         String url = fileStorageService.saveImage(file);
         p.changeThumbnailUrl(url);
+        Product saved = productRepository.save(p);
 
-        return ProductDto.from(p);
+        return ProductDto.from(saved);
     }
 }

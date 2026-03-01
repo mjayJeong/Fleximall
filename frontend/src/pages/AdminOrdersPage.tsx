@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiFetch } from "../lib/api";
 
 type OrderItem = {
   productId: number;
@@ -42,9 +43,16 @@ export default function AdminOrdersPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/orders?${params}`);
+      const res = await apiFetch(`/api/admin/orders?${params}`);
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `HTTP ${res.status}`);
+      }
       const json = await res.json();
       setData(json);
+    } catch (e) {
+      console.error(e);
+      setData(null);
     } finally {
       setLoading(false);
     }
@@ -59,13 +67,13 @@ export default function AdminOrdersPage() {
   const totalPages = data?.totalPages ?? 0;
 
   const updateStatus = async (orderId: number, status: string) => {
-    const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+    const res = await apiFetch(`/api/admin/orders/${orderId}/status`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
     if (!res.ok) {
-      alert("상태 변경 실패");
+      const text = await res.text();
+      alert(text || "상태 변경 실패");
       return;
     }
     // 화면 즉시 반영

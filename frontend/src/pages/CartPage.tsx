@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiFetch } from "../lib/api";
 
 type CartItem = {
   productId: number;
@@ -19,9 +20,16 @@ export default function CartPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/cart");
+      const res = await apiFetch("/api/cart");
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `HTTP ${res.status}`);
+      }
       const data = await res.json();
       setItems(data);
+    } catch (e) {
+      console.error(e);
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -48,16 +56,15 @@ export default function CartPage() {
         .filter((it) => it.quantity > 0)
     );
 
-    await fetch(`/api/cart/items/${productId}`, {
+    await apiFetch(`/api/cart/items/${productId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ quantity: nextQty }),
     });
   };
 
   const remove = async (productId: number) => {
     setItems((prev) => prev.filter((it) => it.productId !== productId));
-    await fetch(`/api/cart/items/${productId}`, { method: "DELETE" });
+    await apiFetch(`/api/cart/items/${productId}`, { method: "DELETE" });
   };
 
   return (
@@ -91,6 +98,7 @@ export default function CartPage() {
                     <img
                       src={it.thumbnailUrl}
                       alt={it.name}
+                      onError={(e) => { e.currentTarget.src = "/no-image.svg"; }}
                       className="w-24 h-24 object-cover rounded-xl"
                     />
 
@@ -164,7 +172,7 @@ export default function CartPage() {
               className="w-full bg-black text-white py-3 rounded-xl hover:bg-gray-800 disabled:opacity-60"
               disabled={items.length === 0 || items.some((it) => it.quantity > it.stock)}
               onClick={async() => {
-                const res = await fetch("/api/orders", { method: "POST" });
+                const res = await apiFetch("/api/orders", { method: "POST" });
                 if (!res.ok) {
                   const text = await res.text();
                   alert(text || "주문 실패");

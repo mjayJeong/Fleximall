@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiFetch } from "../lib/api";
 
 type OrderItem = {
     productId: number;
@@ -24,9 +25,16 @@ export default function OrdersPage() {
     const load = async() => {
         setLoading(true);
         try {
-            const res = await fetch("/api/orders");
+            const res = await apiFetch("/api/orders");
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || `HTTP ${res.status}`);
+            }
             const data = await res.json();
             setOrders(data);
+        } catch (e) {
+            console.error(e);
+            setOrders([]);
         } finally {
             setLoading(false);
         }

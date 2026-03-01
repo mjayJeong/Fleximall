@@ -1,11 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from '../lib/api';
 
 type Form = {
     name: string;
     price: string;
     stock: string;
-    thumbnailUrl: string;
+};
+
+type ProductDto = {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  status: string;
+  thumbnailUrl: string;
 };
 
 export default function AdminProductNewPage() {
@@ -14,14 +23,10 @@ export default function AdminProductNewPage() {
     name: "",
     price: "",
     stock: "",
-    thumbnailUrl: "",
   });
+  const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const onChange = (key: keyof Form, value: string) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,25 +36,33 @@ export default function AdminProductNewPage() {
     if (!form.name.trim()) return setError("상품명을 입력해줘.");
     if (!form.price || Number(form.price) <= 0) return setError("가격은 1원 이상.");
     if (form.stock === "" || Number(form.stock) < 0) return setError("재고는 0 이상.");
-    if (!form.thumbnailUrl.trim()) return setError("썸네일 URL을 입력해줘.");
+    if (!file) return setError("썸네일 이미지를 선택해줘.");
 
     setSaving(true);
     try {
-      const res = await fetch("/api/admin/products", {
+      // 1. 상품 생성
+     const createRes = await apiFetch("/api/admin/products", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
           price: Number(form.price),
           stock: Number(form.stock),
-          thumbnailUrl: form.thumbnailUrl,
         }),
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "등록 실패");
-      }
+      if (!createRes.ok) throw new Error(await createRes.text());
+      const created: ProductDto = await createRes.json();
+      
+      // 2. 썸네일 업로드
+      const fd = new FormData();
+      fd.append("file", file);
+
+      const uploadRes = await apiFetch(`/api/admin/products/${created.id}/thumbnail`, {
+        method: "POST",
+        body: fd,
+      });
+
+      if (!uploadRes.ok) throw new Error(await uploadRes.text());
 
       // 등록 성공 -> 상품 목록으로 이동
       nav("/");
@@ -70,8 +83,7 @@ export default function AdminProductNewPage() {
                 <input 
                     className="w-full border rounded px-3 py-2"
                     value={form.name}
-                    onChange={(e) => onChange("name", e.target.value)}
-                    placeholder="ex) 무선 마우스"
+                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                 />
             </div>
 
@@ -81,8 +93,7 @@ export default function AdminProductNewPage() {
                     <input
                     className="w-full border rounded px-3 py-2"
                     value={form.price}
-                    onChange={(e) => onChange("price", e.target.value)}
-                    placeholder="19900"
+                    onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))}
                     inputMode="numeric"
                     />
                 </div>
@@ -92,24 +103,21 @@ export default function AdminProductNewPage() {
                     <input
                     className="w-full border rounded px-3 py-2"
                     value={form.stock}
-                    onChange={(e) => onChange("stock", e.target.value)}
-                    placeholder="12"
+                    onChange={(e) => setForm((p) => ({ ...p, stock: e.target.value }))}
                     inputMode="numeric"
                     />
                 </div>
                 </div>
 
                 <div>
-                <label className="block text-sm font-medium mb-1">썸네일 URL</label>
-                <input
-                    className="w-full border rounded px-3 py-2"
-                    value={form.thumbnailUrl}
-                    onChange={(e) => onChange("thumbnailUrl", e.target.value)}
-                    placeholder="https://..."
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                    일단은 URL로. (나중에 파일 업로드로 바꿀 거야)
-                </p>
+                  <label className="block text-sm font-medium mb-1">이미지</label>
+                  <input
+                      type='file'
+                      accept='image/*'
+                      className='w-full'
+                      onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  />
+                  {file && <p className='text-xs text-gray-600 mt-1'>선택됨: {file.name}</p>}
                 </div>
 
                 {error && (

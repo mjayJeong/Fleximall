@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { apiFetch } from "../lib/api";
 
 type ProductDetail = {
     id: number;
@@ -23,9 +24,16 @@ export default function ProductDetailPage() {
     const load = async() => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/products/${productId}`);
+            const res = await apiFetch(`/api/products/${productId}`);
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || `HTTP ${res.status}`);
+            }
             const json = await res.json();
             setData(json);
+        } catch (e) {
+            console.error(e);
+            setData(null);
         } finally {
             setLoading(false);
         }
@@ -40,7 +48,11 @@ export default function ProductDetailPage() {
         if (!data) return;
         setToggling(true);
         try {
-            const res = await fetch(`/api/wishlist/${data.id}/toggle`, {method: "POST"});
+            const res = await apiFetch(`/api/wishlist/${data.id}/toggle`, {method: "POST"});
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || `HTTP ${res.status}`);
+            }
             const json = await res.json();
 
             setData((prev) => {
@@ -85,6 +97,7 @@ export default function ProductDetailPage() {
                         <img 
                             src={data.thumbnailUrl}
                             alt={data.name}
+                            onError={(e) => { e.currentTarget.src = "/no-image.svg"; }}
                             className="w-full h-72 object-cover rounded-xl"
                         />
 
@@ -129,11 +142,15 @@ export default function ProductDetailPage() {
                                     <button
                                         className="flex-1 bg-black text-white py-3 rounded hover:bg-gray-800"
                                         onClick={async() => {
-                                            await fetch("/api/cart/items", {
+                                            const res = await apiFetch("/api/cart/items", {
                                                 method: "POST",
-                                                headers: { "Content-Type": "application/json" },
                                                 body: JSON.stringify({ productId: data.id, quantity: 1 }),
                                             });
+                                            if (!res.ok) {
+                                                const text = await res.text();
+                                                alert(text || "장바구니 추가 실패");
+                                                return;
+                                            }
                                             alert("장바구니에 담았어!");
                                         }}
                                     >

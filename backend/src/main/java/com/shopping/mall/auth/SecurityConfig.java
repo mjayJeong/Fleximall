@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .headers(h -> h.frameOptions(f -> f.disable())) // H2 console
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/products/**").permitAll() // 상품 조회는 공개

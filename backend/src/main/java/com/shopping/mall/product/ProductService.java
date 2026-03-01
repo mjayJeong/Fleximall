@@ -53,7 +53,7 @@ public class ProductService {
         Product product = Product.builder()
                 .name(name)
                 .price(price)
-                .thumbnailUrl("/uploads/placeholder.png")
+                .thumbnailUrl("/no-image.svg")
                 .status(ProductStatus.ON_SALE)      // 초기에는 ON_SALE 상태로
                 .stock(stock)
                 .build();

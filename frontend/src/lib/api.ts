@@ -7,8 +7,11 @@ export async function apiFetch(input: RequestInfo, init: RequestInit = {}) {
   const headers = new Headers(init.headers);
 
   if (token) headers.set("Authorization", `Bearer ${token}`);
-  if (!headers.has("Content-Type") && init.body) headers.set("Content-Type", "application/json");
+  
+  const isFormData = init.body instanceof FormData;
+  if (!isFormData && init.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
 
-  const res = await fetch(input, { ...init, headers });
-  return res;
+  return fetch(input, { ...init, headers });
 }

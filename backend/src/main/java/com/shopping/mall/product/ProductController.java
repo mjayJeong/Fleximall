@@ -38,7 +38,7 @@ public class ProductController {
     @Operation(summary = "상품 등록", description = "상품을 등록합니다.")
     @PostMapping("/admin/products")
     public ProductDto createProduct(@RequestBody CreateProductRequest req) {
-        Product p = productService.create(req.name(), req.price(), req.stock(), req.thumbnailUrl());
+        Product p = productService.create(req.name(), req.price(), req.stock(), null);
         return ProductDto.from(p);
     }
 
