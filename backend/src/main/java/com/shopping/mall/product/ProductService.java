@@ -1,5 +1,6 @@
 package com.shopping.mall.product;
 
+import com.shopping.mall.auth.AuthContext;
 import com.shopping.mall.wishlist.WishlistRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,6 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final WishlistRepository wishlistRepository;
-
-    private static final Long DEMO_USER_ID = 1L;
 
     public Page<Product> findPage(String query, int page, int size, String sortKey) {
         Pageable pageable;
@@ -65,11 +64,12 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public ProductDetailDto getDetail(Long id) {
+        Long uid = AuthContext.userId();
         Product p = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("product not found"));
 
         long wishCount = wishlistRepository.countByProduct_Id(id);
-        boolean wished = wishlistRepository.existsByUserIdAndProduct_Id(DEMO_USER_ID, id);
+        boolean wished = wishlistRepository.existsByUserIdAndProduct_Id(uid, id);
 
         return new ProductDetailDto(
                 p.getId(),

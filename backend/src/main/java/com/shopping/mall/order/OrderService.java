@@ -1,5 +1,6 @@
 package com.shopping.mall.order;
 
+import com.shopping.mall.auth.AuthContext;
 import com.shopping.mall.cart.CartItem;
 import com.shopping.mall.cart.CartItemRepository;
 import com.shopping.mall.product.Product;
@@ -23,10 +24,9 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
 
-    private static final Long DEMO_USER_ID = 1L;
-
     public OrderDto createOrderFromCart() {
-        List<CartItem> cartItems = cartItemRepository.findByUserId(DEMO_USER_ID);
+        Long uid = AuthContext.userId();
+        List<CartItem> cartItems = cartItemRepository.findByUserId(uid);
         if (cartItems.isEmpty()) {
             throw new IllegalArgumentException("cart is empty");
         }
@@ -44,7 +44,7 @@ public class OrderService {
 
         // 2. 주문 생성
         Order order = Order.builder()
-                .userId(DEMO_USER_ID)
+                .userId(uid)
                 .status(OrderStatus.PAID)
                 .totalPrice(0)
                 .build();
@@ -83,7 +83,8 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<OrderDto> getMyOrders() {
-        return orderRepository.findByUserIdOrderByCreatedAtDesc(DEMO_USER_ID).stream()
+        Long uid = AuthContext.userId();
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(uid).stream()
                 .map(this::toDto)
                 .toList();
     }
