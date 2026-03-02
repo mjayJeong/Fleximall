@@ -27,4 +27,19 @@ public class AdminProductController {
 
         return ProductDto.from(saved);
     }
+
+    @PatchMapping("/{id}")
+    public ProductDto updateProduct(@PathVariable Long id, @RequestBody UpdateProductRequest req) {
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("product not found"));
+
+        p.updateBasic(req.name(), req.price(), req.stock());
+        Product saved = productRepository.save(p);
+        return ProductDto.from(saved);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        productRepository.deleteById(id);
+    }
 }

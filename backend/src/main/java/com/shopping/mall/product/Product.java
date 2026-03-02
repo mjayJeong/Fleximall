@@ -43,4 +43,10 @@ public class Product {
     public void changeThumbnailUrl(String url) {
         this.thumbnailUrl = url;
     }
+
+    public void updateBasic(String name, int price, int stock) {
+        this.name = name;
+        this.price = price;
+        changeStock(stock);
+    }
 }

@@ -23,6 +23,10 @@ public class SecurityConfig {
                 .headers(h -> h.frameOptions(f -> f.disable())) // H2 console
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/api-docs/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()

@@ -8,6 +8,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminOrdersPage from './pages/AdminOrdersPage';
 import AdminGuard from './components/AdminGuard';
 import LoginPage from './pages/LoginPage';
+import AdminProductsPage from './pages/AdminProductsPage';
+import AdminProductEditPage from './pages/AdminProductEditPage';
 
 export default function App() {
   const nav = useNavigate();
@@ -33,6 +35,9 @@ export default function App() {
             </Link>
             <Link className="text-red-500 hover:underline" to="/admin/products/new">
               상품 등록
+            </Link>
+            <Link className="text-red-500 hover:underline" to="/admin/products">
+              관리자 상품목록
             </Link>
             <Link className="text-red-500 hover:underline" to="/admin/dashboard">
               관리자 대시보드
@@ -68,8 +73,10 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
 
           <Route path="/admin/products/new" element={<AdminGuard><AdminProductNewPage /></AdminGuard>} />
+          <Route path="/admin/products" element={<AdminGuard><AdminProductsPage /></AdminGuard>} />
           <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboardPage /></AdminGuard>} />
           <Route path="/admin/orders" element={<AdminGuard><AdminOrdersPage /></AdminGuard>} />
+          <Route path="/admin/products/:id/edit" element={<AdminGuard><AdminProductEditPage /></AdminGuard>} />
         </Routes>
       </main>
     </div>

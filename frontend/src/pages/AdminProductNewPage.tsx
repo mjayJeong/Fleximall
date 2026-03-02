@@ -65,7 +65,7 @@ export default function AdminProductNewPage() {
       if (!uploadRes.ok) throw new Error(await uploadRes.text());
 
       // 등록 성공 -> 상품 목록으로 이동
-      nav("/");
+      nav("/admin/products");
     } catch (err: any) {
       setError(err.message ?? "에러 발생");
     } finally {
