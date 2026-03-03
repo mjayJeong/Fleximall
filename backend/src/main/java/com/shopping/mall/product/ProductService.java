@@ -67,6 +67,9 @@ public class ProductService {
         Long uid = AuthContext.userId();
         Product p = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("product not found"));
+        if (!p.isActive()) {
+            throw new IllegalArgumentException("product not found");
+        }
 
         long wishCount = wishlistRepository.countByProduct_Id(id);
         boolean wished = wishlistRepository.existsByUserIdAndProduct_Id(uid, id);

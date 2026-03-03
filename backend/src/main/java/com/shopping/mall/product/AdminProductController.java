@@ -43,5 +43,6 @@ public class AdminProductController {
         Product p = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("product not found"));
         p.deactivate();
+        productRepository.save(p);
     }
 }
