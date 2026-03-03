@@ -40,6 +40,8 @@ public class AdminProductController {
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
-        productRepository.deleteById(id);
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("product not found"));
+        p.deactivate();
     }
 }

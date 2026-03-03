@@ -14,6 +14,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
 
 springdoc:
   api-docs:
@@ -23,3 +27,6 @@ springdoc:
 
 app:
   upload-dir: uploads
+  upload:
+    max-bytes: 2097152
+    allowed-ext: jpg, jpeg, png, webp

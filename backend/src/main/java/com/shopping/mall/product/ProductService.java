@@ -26,9 +26,9 @@ public class ProductService {
         if ("POPULAR".equals(sortKey)) {
             pageable = PageRequest.of(page, size);
             if (query == null || query.isBlank()) {
-                return productRepository.findAllOrderByPopular(pageable);
+                return productRepository.findAllActiveOrderByPopular(pageable);
             }
-            return productRepository.findByNameOrderByPopular(query.trim(), pageable);
+            return productRepository.findActiveByNameOrderByPopular(query.trim(), pageable);
         }
 
         Sort sort = switch (sortKey) {
@@ -40,9 +40,9 @@ public class ProductService {
         pageable = PageRequest.of(page, size, sort);
 
         if (query == null || query.isBlank()) {
-            return productRepository.findAll(pageable);
+            return productRepository.findByIsActiveTrue(pageable);
         }
-        return productRepository.findByNameContainingIgnoreCase(query.trim(), pageable);
+        return productRepository.findByIsActiveTrueAndNameContainingIgnoreCase(query.trim(), pageable);
     }
 
 //    public List<Product> findAll() {

@@ -30,9 +30,13 @@ public class Product {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private boolean isActive;
+
     @PrePersist
     public void prePersist() {
         if (createdAt == null) createdAt = LocalDateTime.now();
+        if (!isActive) isActive = true;
     }
 
     public void changeStock(int stock) {
@@ -48,5 +52,12 @@ public class Product {
         this.name = name;
         this.price = price;
         changeStock(stock);
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
+    public void activate() {
+        this.isActive = true;
     }
 }

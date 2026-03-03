@@ -12,23 +12,29 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByNameContainingIgnoreCase(String query, Pageable pageable);
 
     @Query("""
-            SELECT p
-            FROM Product p
-            LEFT JOIN Wishlist w on w.product = p
-            GROUP BY p
-            ORDER BY COUNT(w) DESC, p.createdAt DESC
-            """)
-    Page<Product> findAllOrderByPopular(Pageable pageable);
+        SELECT p
+        FROM Product p
+        LEFT JOIN Wishlist w ON w.product = p
+        WHERE p.isActive = true
+        GROUP BY p
+        ORDER BY COUNT(w) DESC, p.createdAt DESC
+    """)
+    Page<Product> findAllActiveOrderByPopular(Pageable pageable);
 
     @Query("""
-            SELECT p
-            FROM Product p
-            LEFT JOIN Wishlist w on w.product = p
-            WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%'))
-            GROUP BY p
-            ORDER BY COUNT(w) DESC, p.createdAt DESC
-            """)
-    Page<Product> findByNameOrderByPopular(@Param("query") String query, Pageable pageable);
+        SELECT p
+        FROM Product p
+        LEFT JOIN Wishlist w ON w.product = p
+        WHERE p.isActive = true
+          AND LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%'))
+        GROUP BY p
+        ORDER BY COUNT(w) DESC, p.createdAt DESC
+    """)
+    Page<Product> findActiveByNameOrderByPopular(@Param("query") String query, Pageable pageable);
 
     List<Product> findTop5ByOrderByStockAsc();
+
+    Page<Product> findByIsActiveTrue(Pageable pageable);
+
+    Page<Product> findByIsActiveTrueAndNameContainingIgnoreCase(String query, Pageable pageable);
 }
